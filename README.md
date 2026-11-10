@@ -1,34 +1,29 @@
-# Hallucination Detection Lab
+# Hallucination detection lab
 
-This repository provides simple heuristics and utilities for detecting hallucinations in
-language model outputs.  Hallucinations occur when a model generates information that is not
-supported by the provided context or training data.  Detecting hallucinations is an active
-area of research; this project demonstrates lightweight techniques that can serve as
-building blocks for more sophisticated evaluators.
+A lexical baseline for response evaluation. `detector.py` measures the fraction
+of answer tokens appearing in a source context and checks for a bracketed
+citation marker. It flags answers below a configurable overlap threshold or
+without a marker.
 
-## Included components
+## Run the example
 
-* `detector.py` – contains functions for measuring the degree to which an answer is grounded
-  in a given context and for checking whether citations are present.
-* `tests/` – unit tests illustrating how the detection functions work on sample inputs.
-
-## Getting started
-
-Install dependencies and run the tests:
+From the repository root:
 
 ```bash
-pip install -r requirements.txt
-pytest tests
+python -c "from detector import evaluate_answer; print(evaluate_answer('Solar panels convert sunlight into electricity.', 'Solar panels convert sunlight into electricity [1].', 0.3))"
 ```
 
-## Approach
+The flag is `False` and the overlap score is about `0.8571` for this fixture.
+The marker contributes a token absent from the context. Word variations,
+negation, and factual correctness need further evaluation. A citation marker
+does not verify that the cited source exists or supports a claim.
 
-The current implementation uses very simple heuristics:
+## Verify
 
-* **Groundedness score**: compute the overlap between the answer tokens and the context tokens.
-  A low overlap suggests the answer may include unsupported statements.
-* **Citation check**: verify that the answer includes bracketed citation markers (e.g. `[1]`).
+```bash
+python -m pip install -r requirements.txt
+python -m pytest -q
+```
 
-These rules are intentionally naive but provide a starting point for building more advanced
-hallucination detectors.  In a production environment you could integrate fact extraction,
-knowledge graphs, or retrieval‑augmented verification to improve accuracy.
+The tests exercise overlap, citation markers, and threshold decisions. The
+word-variation example has exactly 0.5 lexical overlap.
