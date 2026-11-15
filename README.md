@@ -27,3 +27,16 @@ python -m pytest -q
 
 The tests exercise overlap, citation markers, and threshold decisions. The
 word-variation example has exactly 0.5 lexical overlap.
+
+## Deployment verification
+
+Use Python 3.12 on Linux. CI and Docker apply the checked-in dependency constraints.
+
+```sh
+python -m pip install -c requirements.lock -r requirements-dev.txt
+python -m pytest -q
+docker build -t reviewer-smoke .
+docker run --rm reviewer-smoke
+```
+
+Expected result: an unflagged answer and a lexical overlap around `0.8571`. This is a heuristic over a fixture; the result alone cannot establish factual correctness.
